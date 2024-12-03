@@ -21,13 +21,33 @@ services:
       libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
       libatspi2.0-0 libxshmfence1 && python -m pip install --upgrade pip && pip
       install pyppeteer Pillow asyncio aiohttp opencv-python-headless ddddocr
-      quart && rm -rf && wget -O api.py
+      quart && rm -rf * && wget -O api.py
       https://raw.githubusercontent.com/zhao-zg/jd-login/main/api.py
       && wget -O login.py
       https://raw.githubusercontent.com/zhao-zg/jd-login/main/login.py
       && python api.py"
 networks: {}
 
+```
+下面是已经安装好环境的dokcer，省去安装环境
+```
+version: "3"
+services:
+  jd_autologin:
+    image: zzg1189/jd_login_env:latest
+    container_name: jd_login_env
+    restart: unless-stopped
+    ports:
+      - 12345:12345
+    working_dir: /app
+    environment:
+      TZ: Asia/Shanghai
+    command: >
+      sh -c "rm -rf * && wget -O api.py
+      https://raw.githubusercontent.com/zhao-zg/jd-login/main/api.py && wget -O
+      login.py https://raw.githubusercontent.com/zhao-zg/jd-login/main/login.py
+      && python api.py"
+networks: {}
 ```
 
 # 感谢作者小九九
