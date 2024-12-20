@@ -1,7 +1,7 @@
 /**
  * @author 小九九 t.me/gdot0
  * @description 清空账密登录锁
- * @origin 小九九
+ * @team 小九九
  * @team 小九九
  * @version v1.0.0
  * @name 清空账密登录锁
@@ -10,7 +10,7 @@
  * @admin true
  * @disable false
  * @cron 0 0 3 * * *
- * @public true
+ * false
  * @classification ["Server"]
  */
 //清空账密登录.ts的每日登录数量限制

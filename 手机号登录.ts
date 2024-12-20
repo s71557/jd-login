@@ -1,7 +1,7 @@
 /**
  * @author 小九九 t.me/gdot0
  * @description 手机号登录
- * @origin 小九九
+ * @team 小九九
  * @team 小九九
  * @version v1.0.0
  * @name 手机号登录
@@ -10,9 +10,9 @@
  * @rule ^(手机号登录|密码登录) ([^\s]+) ([^\s]+)$
  * @priority 10000
  * @admin false
- * @public true
+ * false
  * @disable false
- * @cron 30 31 *\/3 * * *
+ * @cron 0 30 * * * *
  * @classification ["Server"]
  */
 /*
@@ -29,7 +29,7 @@
 4.仅Windows环境下测试，理论上linux也可以
 */
 //配置
-const apiBackend = "http://192.168.5.230:12345"; //后台地址，后台代码见附件文件夹，do not end with '/'
+const apiBackend = "http://10.10.10.250:12345"; //后台地址，后台代码见附件文件夹，do not end with '/'
 const waitTime = 60; //等待用户输入的时间，秒
 let smsRetry = 3; //短信验证允许错几次
 const ReplyMsgs = {
@@ -171,7 +171,7 @@ module.exports = async (s) => {
 			if (s.param(2)) {
 				phone = s.param(2);
 			}else{
-				await s.reply("请输入手机号：");
+				await s.reply("请输入京东账号[手机号/用户名]:输入q随时退出");
 				const aMsg = await s.waitInput(() => {}, waitTime);
 				if (!aMsg) return s.reply(ReplyMsgs.timeout);
 				phone = aMsg.getMsg();
@@ -191,20 +191,20 @@ module.exports = async (s) => {
 				password = s.param(3);
 			} else if (s.param(2)) {
 				account = s.param(2);
-				await s.reply("请输入密码：");
+				await s.reply("请输入密码:输入q随时退出");
 				const pMsg = await s.waitInput(() => {}, waitTime);
 				if (!pMsg) return s.reply(ReplyMsgs.timeout);
 				password = pMsg.getMsg();
 				await s.delMsg(pMsg.getMsgId());
 				if (password == "q") return s.reply(ReplyMsgs.quit);
 			} else {
-				await s.reply("请输入账号：");
+				await s.reply("请输入京东账号[手机号/用户名]:输入q随时退出");
 				const aMsg = await s.waitInput(() => {}, waitTime);
 				if (!aMsg) return s.reply(ReplyMsgs.timeout);
 				account = aMsg.getMsg();
 				await s.delMsg(aMsg.getMsgId());
 				if (account == "q") return s.reply(ReplyMsgs.quit);
-				await s.reply("请输入密码：");
+				await s.reply("请输入密码:输入q随时退出");
 				const pMsg = await s.waitInput(() => {}, waitTime);
 				if (!pMsg) return s.reply(ReplyMsgs.timeout);
 				password = pMsg.getMsg();
