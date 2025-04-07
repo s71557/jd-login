@@ -18,7 +18,7 @@ import base64
 import io
 import re
 import logging
-from fake_useragent import UserAgent
+#from fake_useragent import UserAgent
 
 # 传参获得已初始化的ddddocr实例
 ocr = None
@@ -127,7 +127,7 @@ async def loginPhone(chromium_path, workList, uid, headless):
     )
     page = await browser.newPage()
     await page.setUserAgent(
-        UserAgent().random
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
     )
     await page.setViewport({"width": 360, "height": 640})
     await page.goto(
@@ -163,7 +163,7 @@ async def loginPhone(chromium_path, workList, uid, headless):
                     workList[uid].msg = "正在过滑块检测"
                     await verification(page)
                     await page.waitFor(2000)
-                elif await page.xpath('//*[@id="captcha_modal"]/div/div[3]/button'):
+                elif await page.xpath('//*[@id="captcha_modal"]/div/div[4]/button'):
                     logger.info("进入点形状、颜色验证分支")
 
                     workList[uid].status = "pending"
@@ -308,8 +308,10 @@ async def loginPassword(chromium_path, workList, uid, headless):
     )
     page = await browser.newPage()
     await page.setUserAgent(
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
     )
+    #user_agent = await page.evaluate("navigator.userAgent")
+    #print(f"User-Agent: {user_agent}")
     await page.setViewport({"width": 360, "height": 640})
     await page.goto(
         "https://plogin.m.jd.com/login/login?appid=300&returnurl=https%3A%2F%2Fm.jd.com%2F&source=wq_passport"
@@ -360,7 +362,7 @@ async def loginPassword(chromium_path, workList, uid, headless):
                     await verification(page)
                     await page.waitFor(3000)
 
-                elif await page.xpath('//*[@id="captcha_modal"]/div/div[3]/button'):
+                elif await page.xpath('//*[@id="captcha_modal"]/div/div[4]/button'):
                     logger.info("进入点形状、颜色验证分支")
                     workList[uid].status = "pending"
                     workList[uid].msg = "正在过形状、颜色检测"
@@ -587,7 +589,7 @@ async def typeuser(page, usernum, passwd):
     await page.waitFor(random.randint(100, 2000))
     await page.click(".policy_tip-checkbox")
     await page.waitFor(random.randint(100, 2000))
-    await page.click(".btn.J_ping.btn-active")
+    await page.click(".btn.J_ping.active")
     await page.waitFor(random.randint(100, 2000))
 
 
@@ -610,11 +612,9 @@ async def sendSMSDirectly(page):
         while True:
             if await page.xpath('//*[@id="small_img"]'):
                 await verification(page)
-
-            elif await page.xpath('//*[@id="captcha_modal"]/div/div[3]/button'):
+            elif await page.xpath('//*[@id="captcha_modal"]/div/div[4]/button'):
                 if await verification_shape(page) == "notSupport":
                     return "notSupport"
-
             else:
                 break
 
@@ -652,11 +652,9 @@ async def sendSMS(page):
         while True:
             if await page.xpath('//*[@id="small_img"]'):
                 await verification(page)
-
-            elif await page.xpath('//*[@id="captcha_modal"]/div/div[3]/button'):
+            elif await page.xpath('//*[@id="captcha_modal"]/div/div[4]/button'):
                 if await verification_shape(page) == "notSupport":
                     return "notSupport"
-
             else:
                 break
 
@@ -790,8 +788,12 @@ async def verification(page):
     resized_image.save("template.png")
     await page.waitFor(100)
     el = await page.querySelector(
-        "#captcha_modal > div > div.captcha_footer > div > img"
+        "#captcha_modal > div > div.captcha_footer > div > div.sp-msg"
     )
+    if not el:
+        el = await page.querySelector(
+            "#captcha_modal > div > div.captcha_footer > div > img"
+        )
     box = await el.boundingBox()
     distance = await get_distance()
     await page.mouse.move(box["x"] + 10, box["y"] + 10)
@@ -806,7 +808,7 @@ async def verification(page):
         box["x"] + distance, box["y"], {"steps": 10}
     )
     await page.waitFor(
-        random.randint(200, 500)
+        random.randint(400, 1000)
     )
     await page.mouse.up()
     logger.info("过滑块结束")
@@ -950,9 +952,9 @@ async def verification_shape(page):
         rgba2rgb("rgb_word_img.png", "rgba_word_img.png")
         word = get_word(ocr, "rgb_word_img.png")
 
-        button = await page.querySelector("div.captcha_footer button.sure_btn")
+        button = await page.querySelector("div.captcha_footer button#submit-btn")
         if button is None:
-            button = await page.querySelector(".sure_btn")
+            button = await page.querySelector("button#submit-btn")
         if button is None:
             logger.info("未找到提交按钮")
             raise "未找到提交按钮"
